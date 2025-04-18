@@ -1,8 +1,37 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { Link, router } from 'expo-router';
+import { useState } from 'react';
+import { useAuth } from '../../lib/auth-context';
 import { ArrowRight } from 'lucide-react-native';
 
 export default function ForgotPassword() {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { resetPassword } = useAuth();
+
+  const handleResetPassword = async () => {
+    try {
+      setLoading(true);
+      await resetPassword(email);
+      Alert.alert('Success', 'Please check your email for reset instructions');
+      router.replace('/(auth)/signin');
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -21,11 +50,19 @@ export default function ForgotPassword() {
             style={styles.input}
             autoCapitalize="none"
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
 
-        <TouchableOpacity style={styles.resetButton}>
-          <Text style={styles.resetButtonText}>Send Reset Link</Text>
+        <TouchableOpacity
+          style={[styles.resetButton, loading && styles.disabledButton]}
+          onPress={handleResetPassword}
+          disabled={loading}
+        >
+          <Text style={styles.resetButtonText}>
+            {loading ? 'Sending...' : 'Send Reset Link'}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.signin}>
@@ -50,6 +87,10 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginTop: 40,
+  },
+  disabledButton: {
+    opacity: 0.5,
+    backgroundColor: '#3a9176',
   },
   iconContainer: {
     width: 48,

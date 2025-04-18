@@ -1,8 +1,60 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { Link, router } from 'expo-router';
 import { ArrowRight, Apple, Eye } from 'lucide-react-native';
+import { useState } from 'react';
+import { useAuth } from '../../lib/auth-context';
 
 export default function SignIn() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { signIn, signInWithGoogle, signInWithApple } = useAuth();
+
+  const handleSignIn = async () => {
+    try {
+      setLoading(true);
+      await signIn(email, password);
+      router.replace('/(tabs)');
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      );
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      await signInWithApple();
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -14,14 +66,20 @@ export default function SignIn() {
       </View>
 
       <View style={styles.socialButtons}>
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleGoogleSignIn}
+        >
           <View style={styles.googleIcon}>
             <Text style={styles.googleText}>G</Text>
           </View>
           <Text style={styles.socialButtonText}>Continue with Google</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleAppleSignIn}
+        >
           <Apple color="#fff" size={20} />
           <Text style={styles.socialButtonText}>Continue with Apple</Text>
         </TouchableOpacity>
@@ -41,6 +99,8 @@ export default function SignIn() {
             style={styles.input}
             autoCapitalize="none"
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
 
@@ -49,15 +109,26 @@ export default function SignIn() {
             placeholder="Password"
             placeholderTextColor="#6e7781"
             style={styles.input}
-            secureTextEntry
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
           />
-          <TouchableOpacity style={styles.eyeIcon}>
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowPassword(!showPassword)}
+          >
             <Eye color="#6e7781" size={20} />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.signInButton}>
-          <Text style={styles.signInButtonText}>Sign In</Text>
+        <TouchableOpacity
+          style={[styles.signInButton, loading && styles.disabledButton]}
+          onPress={handleSignIn}
+          disabled={loading}
+        >
+          <Text style={styles.signInButtonText}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Text>
         </TouchableOpacity>
 
         <Link href="/(auth)/forgot-password" asChild>
@@ -139,6 +210,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'Inter-Medium',
     fontSize: 16,
+  },
+  disabledButton: {
+    opacity: 0.5,
+    backgroundColor: '#3a9176',
   },
   divider: {
     flexDirection: 'row',

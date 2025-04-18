@@ -1,8 +1,61 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { Link, router } from 'expo-router';
 import { ArrowRight, Apple, Eye } from 'lucide-react-native';
+import { useState } from 'react';
+import { useAuth } from '../../lib/auth-context';
 
 export default function SignUp() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { signUp, signInWithGoogle, signInWithApple } = useAuth();
+
+  const handleSignUp = async () => {
+    try {
+      setLoading(true);
+      await signUp(email, password);
+      Alert.alert('Success', 'Please check your email for verification');
+      router.replace('/(auth)/signin');
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      );
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      await signInWithApple();
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -14,14 +67,20 @@ export default function SignUp() {
       </View>
 
       <View style={styles.socialButtons}>
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleGoogleSignIn}
+        >
           <View style={styles.googleIcon}>
             <Text style={styles.googleText}>G</Text>
           </View>
           <Text style={styles.socialButtonText}>Continue with Google</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleAppleSignIn}
+        >
           <Apple color="#fff" size={20} />
           <Text style={styles.socialButtonText}>Continue with Apple</Text>
         </TouchableOpacity>
@@ -41,6 +100,8 @@ export default function SignUp() {
             style={styles.input}
             autoCapitalize="none"
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
 
@@ -49,15 +110,26 @@ export default function SignUp() {
             placeholder="Password"
             placeholderTextColor="#6e7781"
             style={styles.input}
-            secureTextEntry
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
           />
-          <TouchableOpacity style={styles.eyeIcon}>
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowPassword(!showPassword)}
+          >
             <Eye color="#6e7781" size={20} />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.createButton}>
-          <Text style={styles.createButtonText}>Create Account</Text>
+        <TouchableOpacity
+          style={[styles.createButton, loading && styles.disabledButton]}
+          onPress={handleSignUp}
+          disabled={loading}
+        >
+          <Text style={styles.createButtonText}>
+            {loading ? 'Creating Account...' : 'Create Account'}
+          </Text>
         </TouchableOpacity>
 
         <Text style={styles.terms}>
@@ -129,6 +201,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.5,
+    backgroundColor: '#3a9176',
   },
   googleText: {
     color: '#000',
