@@ -1,14 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Header } from '@/components/Header';
-import { NutritionProgress } from '@/components/NutritionProgress';
 import { MealPlan } from '@/components/MealPlan';
+import { NutritionProgress } from '@/components/NutritionProgress';
 import { RecipeRecommendations } from '@/components/RecipeRecommendations';
 import { ToolCards } from '@/components/ToolCards';
+import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 
 export default function HomeScreen() {
-  const insets = useSafeAreaInsets();
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView

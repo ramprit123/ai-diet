@@ -10,9 +10,10 @@ const InitialLoadingPage = () => {
 
   useEffect(() => {
     if (!authLoading && router) {
-      const inAuthGroup = segments[0] === '(auth)';
-      if (user && inAuthGroup) {
-        router.replace('/(tabs)'); // Or your main authenticated route group
+      if (user) {
+        router.replace('/(tabs)');
+      } else {
+        router.replace('/(auth)/signin');
       }
     }
   }, [user, authLoading, segments, router]);
