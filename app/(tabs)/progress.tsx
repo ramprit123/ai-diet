@@ -1,36 +1,36 @@
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CircularProgress } from '@/components/CircularProgress';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Dumbbell, Flame, Heart } from 'lucide-react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function ProgressScreen() {
-  const insets = useSafeAreaInsets();
-  
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-        <View style={[styles.header, { paddingTop: insets.top }]}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
+        <View style={[styles.header]}>
           <Text style={styles.title}>Progress</Text>
           <Text style={styles.subtitle}>Track your fitness journey</Text>
         </View>
 
         <View style={styles.statsGrid}>
-          <StatCard 
+          <StatCard
             icon={<Flame color="#5ee6b8" size={24} />}
             label="Calories Burned"
             value="486"
             target="600"
             progress={0.81}
           />
-          <StatCard 
+          <StatCard
             icon={<Dumbbell color="#5ee6b8" size={24} />}
             label="Protein Goal"
             value="82g"
             target="120g"
             progress={0.68}
           />
-          <StatCard 
+          <StatCard
             icon={<Heart color="#5ee6b8" size={24} />}
             label="Active Minutes"
             value="42"
@@ -42,11 +42,11 @@ export default function ProgressScreen() {
         <View style={styles.weeklyProgress}>
           <Text style={styles.sectionTitle}>Weekly Overview</Text>
           <View style={styles.calorieProgress}>
-            <CircularProgress 
-              value={12450} 
-              maxValue={14000} 
-              radius={60} 
-              strokeWidth={10} 
+            <CircularProgress
+              value={12450}
+              maxValue={14000}
+              radius={60}
+              strokeWidth={10}
             />
             <View style={styles.weeklyStats}>
               <WeeklyStat label="Daily Average" value="1,779" unit="kcal" />
@@ -59,28 +59,28 @@ export default function ProgressScreen() {
         <View style={styles.nutritionProgress}>
           <Text style={styles.sectionTitle}>Nutrition Goals</Text>
           <View style={styles.nutritionCard}>
-            <NutritionGoal 
+            <NutritionGoal
               label="Protein"
               current={82}
               target={120}
               unit="g"
               color="#5ee6b8"
             />
-            <NutritionGoal 
+            <NutritionGoal
               label="Carbs"
               current={180}
               target={250}
               unit="g"
               color="#5ee6b8"
             />
-            <NutritionGoal 
+            <NutritionGoal
               label="Fat"
               current={45}
               target={65}
               unit="g"
               color="#5ee6b8"
             />
-            <NutritionGoal 
+            <NutritionGoal
               label="Water"
               current={1.8}
               target={2.5}
@@ -140,15 +140,25 @@ interface NutritionGoalProps {
   color: string;
 }
 
-function NutritionGoal({ label, current, target, unit, color }: NutritionGoalProps) {
+function NutritionGoal({
+  label,
+  current,
+  target,
+  unit,
+  color,
+}: NutritionGoalProps) {
   const progress = current / target;
-  
+
   return (
     <View style={styles.nutritionGoal}>
       <View style={styles.nutritionGoalHeader}>
         <Text style={styles.nutritionGoalLabel}>{label}</Text>
         <Text style={styles.nutritionGoalValue}>
-          {current} <Text style={styles.nutritionGoalUnit}>/ {target}{unit}</Text>
+          {current}{' '}
+          <Text style={styles.nutritionGoalUnit}>
+            / {target}
+            {unit}
+          </Text>
         </Text>
       </View>
       <ProgressBar progress={progress} color={color} />

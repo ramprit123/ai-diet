@@ -1,48 +1,62 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Camera, Image as ImageIcon, X } from 'lucide-react-native';
+import { useState } from 'react';
+import {
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function ScanScreen() {
-  const insets = useSafeAreaInsets();
   const [showResults, setShowResults] = useState(false);
-  
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={[styles.content, { paddingTop: insets.top }]}>
+      <View style={[styles.content]}>
         <View style={styles.header}>
           <Text style={styles.title}>Scan Food</Text>
-          <Text style={styles.subtitle}>Take a photo of your food to get instant nutrition information</Text>
+          <Text style={styles.subtitle}>
+            Take a photo of your food to get instant nutrition information
+          </Text>
         </View>
 
         {!showResults ? (
           <>
             <View style={styles.cameraPreview}>
               <Camera color="#5ee6b8" size={48} />
-              <Text style={styles.cameraText}>Camera preview will appear here</Text>
+              <Text style={styles.cameraText}>
+                Camera preview will appear here
+              </Text>
             </View>
 
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.button} onPress={() => setShowResults(true)}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => setShowResults(true)}
+              >
                 <Camera color="white" size={24} />
                 <Text style={styles.buttonText}>Take Photo</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={[styles.button, styles.secondaryButton]}>
                 <ImageIcon color="#5ee6b8" size={24} />
-                <Text style={[styles.buttonText, styles.secondaryButtonText]}>Upload Photo</Text>
+                <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+                  Upload Photo
+                </Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.recentScans}>
               <Text style={styles.recentTitle}>Recent Scans</Text>
               <View style={styles.scansGrid}>
-                <RecentScanItem 
+                <RecentScanItem
                   imageUrl="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
                   name="Mediterranean Bowl"
                   calories={420}
                 />
-                <RecentScanItem 
+                <RecentScanItem
                   imageUrl="https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg"
                   name="Acai Bowl"
                   calories={380}
@@ -52,21 +66,23 @@ export default function ScanScreen() {
           </>
         ) : (
           <View style={styles.resultsContainer}>
-            <TouchableOpacity 
-              style={styles.closeButton} 
+            <TouchableOpacity
+              style={styles.closeButton}
               onPress={() => setShowResults(false)}
             >
               <X color="white" size={24} />
             </TouchableOpacity>
 
-            <Image 
-              source={{ uri: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg" }}
+            <Image
+              source={{
+                uri: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+              }}
               style={styles.resultImage}
             />
 
             <View style={styles.nutritionCard}>
               <Text style={styles.foodName}>Mediterranean Bowl</Text>
-              
+
               <View style={styles.nutritionGrid}>
                 <NutritionItem label="Calories" value="420" unit="kcal" />
                 <NutritionItem label="Protein" value="22" unit="g" />
@@ -145,7 +161,7 @@ const styles = StyleSheet.create({
   cameraPreview: {
     backgroundColor: '#1e1e1e',
     borderRadius: 16,
-    aspectRatio: 3/4,
+    aspectRatio: 3 / 4,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,

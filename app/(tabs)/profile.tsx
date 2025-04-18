@@ -1,14 +1,28 @@
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Settings, Award, Calendar, Bell, ChevronRight } from 'lucide-react-native';
+import {
+  Award,
+  Bell,
+  Calendar,
+  ChevronRight,
+  Settings,
+} from 'lucide-react-native';
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function ProfileScreen() {
-  const insets = useSafeAreaInsets();
-  
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-        <View style={[styles.header, { paddingTop: insets.top }]}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
+        <View style={[styles.header]}>
           <View style={styles.headerTop}>
             <Text style={styles.title}>Profile</Text>
             <TouchableOpacity style={styles.settingsButton}>
@@ -17,13 +31,17 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.profileInfo}>
-            <Image 
-              source={{ uri: "https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg" }}
+            <Image
+              source={{
+                uri: 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg',
+              }}
               style={styles.profileImage}
             />
             <Text style={styles.name}>Sarah Wilson</Text>
-            <Text style={styles.bio}>Fitness enthusiast & healthy food lover 🥗</Text>
-            
+            <Text style={styles.bio}>
+              Fitness enthusiast & healthy food lover 🥗
+            </Text>
+
             <View style={styles.statsRow}>
               <View style={styles.stat}>
                 <Text style={styles.statValue}>156</Text>
@@ -45,22 +63,22 @@ export default function ProfileScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Achievements</Text>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.achievementsContainer}
           >
-            <AchievementCard 
+            <AchievementCard
               icon={<Award color="#5ee6b8" size={24} />}
               title="30 Day Streak"
               description="Logged meals for 30 days"
             />
-            <AchievementCard 
+            <AchievementCard
               icon={<Calendar color="#5ee6b8" size={24} />}
               title="Goal Crusher"
               description="Hit all weekly targets"
             />
-            <AchievementCard 
+            <AchievementCard
               icon={<Bell color="#5ee6b8" size={24} />}
               title="Early Bird"
               description="7AM workout complete"
@@ -91,9 +109,7 @@ interface AchievementCardProps {
 function AchievementCard({ icon, title, description }: AchievementCardProps) {
   return (
     <View style={styles.achievementCard}>
-      <View style={styles.achievementIcon}>
-        {icon}
-      </View>
+      <View style={styles.achievementIcon}>{icon}</View>
       <Text style={styles.achievementTitle}>{title}</Text>
       <Text style={styles.achievementDescription}>{description}</Text>
     </View>

@@ -1,18 +1,27 @@
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Image, TouchableOpacity, TextInput } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, Clock, Users, ChefHat } from 'lucide-react-native';
+import { ChefHat, Clock, Search, Users } from 'lucide-react-native';
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function RecipesScreen() {
-  const insets = useSafeAreaInsets();
-  
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-        <View style={[styles.header, { paddingTop: insets.top }]}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
+        <View style={[styles.header]}>
           <Text style={styles.title}>Recipes</Text>
           <View style={styles.searchContainer}>
             <Search color="#a0a0a0" size={20} style={styles.searchIcon} />
-            <TextInput 
+            <TextInput
               style={styles.searchInput}
               placeholder="Search recipes..."
               placeholderTextColor="#a0a0a0"
@@ -21,8 +30,8 @@ export default function RecipesScreen() {
         </View>
 
         <Text style={styles.sectionTitle}>Popular Categories</Text>
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoriesContainer}
         >
@@ -35,28 +44,28 @@ export default function RecipesScreen() {
 
         <Text style={styles.sectionTitle}>Trending Recipes</Text>
         <View style={styles.recipesGrid}>
-          <RecipeCard 
+          <RecipeCard
             name="Mediterranean Bowl"
             time={25}
             servings={2}
             difficulty="Medium"
             imageUrl="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
           />
-          <RecipeCard 
+          <RecipeCard
             name="Acai Smoothie Bowl"
             time={15}
             servings={1}
             difficulty="Easy"
             imageUrl="https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg"
           />
-          <RecipeCard 
+          <RecipeCard
             name="Grilled Salmon"
             time={30}
             servings={4}
             difficulty="Medium"
             imageUrl="https://images.pexels.com/photos/262959/pexels-photo-262959.jpeg"
           />
-          <RecipeCard 
+          <RecipeCard
             name="Quinoa Salad"
             time={20}
             servings={2}
@@ -69,10 +78,22 @@ export default function RecipesScreen() {
   );
 }
 
-function CategoryChip({ label, active = false }) {
+function CategoryChip({
+  label,
+  active = false,
+}: {
+  label: string;
+  active?: boolean;
+}) {
   return (
-    <TouchableOpacity style={[styles.categoryChip, active && styles.categoryChipActive]}>
-      <Text style={[styles.categoryLabel, active && styles.categoryLabelActive]}>{label}</Text>
+    <TouchableOpacity
+      style={[styles.categoryChip, active && styles.categoryChipActive]}
+    >
+      <Text
+        style={[styles.categoryLabel, active && styles.categoryLabelActive]}
+      >
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -85,7 +106,13 @@ interface RecipeCardProps {
   imageUrl: string;
 }
 
-function RecipeCard({ name, time, servings, difficulty, imageUrl }: RecipeCardProps) {
+function RecipeCard({
+  name,
+  time,
+  servings,
+  difficulty,
+  imageUrl,
+}: RecipeCardProps) {
   return (
     <TouchableOpacity style={styles.recipeCard}>
       <Image source={{ uri: imageUrl }} style={styles.recipeImage} />
