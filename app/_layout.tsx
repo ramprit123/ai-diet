@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { AuthWrapper } from '@/components/AuthWrapper';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import {
@@ -32,13 +33,13 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <AuthWrapper>
+      <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+        <StatusBar style="light" />
       </Stack>
-      <StatusBar style="light" />
-    </>
+    </AuthWrapper>
   );
 }
