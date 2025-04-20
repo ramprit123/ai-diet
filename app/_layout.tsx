@@ -35,7 +35,7 @@ export default function RootLayout() {
   return (
     <AuthWrapper>
       <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-        <StatusBar style="inverted" backgroundColor="transparent" translucent />
+        <StatusBar style="dark" />
         <Stack
           screenOptions={{
             headerShown: false,

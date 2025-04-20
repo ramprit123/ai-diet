@@ -3,23 +3,23 @@ import { supabase } from '../supabase';
 
 interface UserProfile {
   id: string;
-  full_name: string;
+  name: string;
   avatar_url: string;
   bio: string;
 }
 
 interface UserStats {
-  workouts_count: number;
-  recipes_count: number;
-  calories_burned: number;
+  workout_count: number;
+  recipe_count: number;
+  total_calories: number;
 }
 
 interface Achievement {
   id: string;
   title: string;
   description: string;
-  icon: string;
-  earned_at: string;
+  icon_name: string;
+  created_at: string;
 }
 
 interface ProfileState {
@@ -43,7 +43,9 @@ export const useProfileStore = create<ProfileState>((set) => ({
   fetchProfile: async () => {
     try {
       set({ isLoading: true, error: null });
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('User not found');
 
       const { data: profile, error } = await supabase
@@ -55,7 +57,10 @@ export const useProfileStore = create<ProfileState>((set) => ({
       if (error) throw error;
       set({ profile });
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to fetch profile' });
+      set({
+        error:
+          error instanceof Error ? error.message : 'Failed to fetch profile',
+      });
     } finally {
       set({ isLoading: false });
     }
@@ -64,7 +69,9 @@ export const useProfileStore = create<ProfileState>((set) => ({
   fetchStats: async () => {
     try {
       set({ isLoading: true, error: null });
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('User not found');
 
       const { data: stats, error } = await supabase
@@ -76,7 +83,9 @@ export const useProfileStore = create<ProfileState>((set) => ({
       if (error) throw error;
       set({ stats });
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to fetch stats' });
+      set({
+        error: error instanceof Error ? error.message : 'Failed to fetch stats',
+      });
     } finally {
       set({ isLoading: false });
     }
@@ -85,18 +94,40 @@ export const useProfileStore = create<ProfileState>((set) => ({
   fetchAchievements: async () => {
     try {
       set({ isLoading: true, error: null });
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('User not found');
-
+      console.log(user.id);
       const { data: achievements, error } = await supabase
-        .from('achievements')
-        .select('*')
-        .eq('id', user.id);
+        .from('user_achievements')
+        .select(
+          `
+          achievements (
+            id,
+            title,
+            description,
+            icon_name,
+            created_at
+          )
+        `
+        )
+        .eq('user_id', user.id);
 
       if (error) throw error;
-      set({ achievements: achievements || [] });
+
+      const formattedAchievements =
+        achievements?.map((item) => item.achievements) || [];
+
+      console.log('formattedAchievements', formattedAchievements);
+      set({ achievements: formattedAchievements.flat() as Achievement[] });
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to fetch achievements' });
+      set({
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to fetch achievements',
+      });
     } finally {
       set({ isLoading: false });
     }

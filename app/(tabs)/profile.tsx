@@ -28,135 +28,174 @@ export default function ProfileScreen() {
     fetchStats,
     fetchAchievements,
   } = useProfileStore();
-
+  const [showFullBio, setShowFullBio] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = React.useCallback(async () => {
-    setRefreshing(true);
+  const fetchAllData = React.useCallback(async () => {
     try {
       await Promise.all([fetchProfile(), fetchStats(), fetchAchievements()]);
     } catch (error) {
-      console.error('Error refreshing profile:', error);
+      console.error('Error fetching profile data:', error);
     }
-    setRefreshing(false);
   }, [fetchProfile, fetchStats, fetchAchievements]);
 
-useEffect(() => {
-  fetchProfile();
-  fetchStats();
-  fetchAchievements();
-}, []);
-return (
-  <SafeAreaView style={styles.container}>
-    <ScrollView
-      style={styles.scrollView}
-      contentContainerStyle={styles.content}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor="#5ee6b8"
-        />
-      }
-    >
-      <View style={[styles.header]}>
-        <View style={styles.headerTop}>
-          <Text style={styles.title}>Profile</Text>
-          <TouchableOpacity style={styles.settingsButton}>
-            <Settings color="white" size={24} />
-          </TouchableOpacity>
-        </View>
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await fetchAllData();
+    setRefreshing(false);
+  }, [fetchAllData]);
 
-        <View style={styles.profileInfo}>
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#5ee6b8" />
-          ) : error ? (
-            <Text style={[styles.bio, { color: '#ff4444' }]}>{error}</Text>
-          ) : (
-            <>
-              <Image
-                source={{
-                  uri:
-                    profile?.avatar_url ||
-                    'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg',
-                }}
-                style={styles.profileImage}
-              />
-              <Text style={styles.name}>{profile?.full_name || 'User'}</Text>
-              <Text style={styles.bio}>
-                {profile?.bio || 'No bio available'}
-              </Text>
-            </>
-          )}
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
 
-          <View style={styles.statsRow}>
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>{stats?.workouts_count || 0}</Text>
-              <Text style={styles.statLabel}>Workouts</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>{stats?.recipes_count || 0}</Text>
-              <Text style={styles.statLabel}>Recipes</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>
-                {(stats?.calories_burned || 0).toLocaleString()}
-              </Text>
-              <Text style={styles.statLabel}>Calories</Text>
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#5ee6b8"
+          />
+        }
+      >
+        <View style={[styles.header]}>
+          <View style={styles.headerTop}>
+            <Text style={styles.title}>Profile</Text>
+            <TouchableOpacity style={styles.settingsButton}>
+              <Settings color="white" size={24} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.profileInfo}>
+            {isLoading ? (
+              <ActivityIndicator size="large" color="#5ee6b8" />
+            ) : (
+              <>
+                <Image
+                  source={{
+                    uri:
+                      profile?.avatar_url ||
+                      'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg',
+                  }}
+                  style={styles.profileImage}
+                />
+                <Text style={styles.name}>{profile?.name || 'User'}</Text>
+                <View>
+                  <Text
+                    numberOfLines={showFullBio ? undefined : 2}
+                    style={styles.bio}
+                  >
+                    {profile?.bio || 'No bio available'}
+                  </Text>
+                  {(profile?.bio?.length ?? 0) > 0 && (
+                    <TouchableOpacity
+                      onPress={() => setShowFullBio(!showFullBio)}
+                      style={{
+                        marginTop: 1,
+                        alignSelf: 'flex-end',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: '#5ee6b8',
+                          fontSize: 14,
+                          fontFamily: 'Inter-Regular',
+                        }}
+                      >
+                        {showFullBio ? 'Show less' : 'Read more'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </>
+            )}
+
+            <View style={styles.statsRow}>
+              <View style={styles.stat}>
+                <Text style={styles.statValue}>
+                  {stats?.workout_count || 0}
+                </Text>
+                <Text style={styles.statLabel}>Workouts</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.stat}>
+                <Text style={styles.statValue}>{stats?.recipe_count || 0}</Text>
+                <Text style={styles.statLabel}>Recipes</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.stat}>
+                <Text style={styles.statValue}>
+                  {(stats?.total_calories || 0).toLocaleString()}
+                </Text>
+                <Text style={styles.statLabel}>Calories</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Achievements</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.achievementsContainer}
-        >
-          {achievements.map((achievement) => (
-            <AchievementCard
-              key={achievement.id}
-              icon={<Award color="#5ee6b8" size={24} />}
-              title={achievement.title}
-              description={achievement.description}
-            />
-          ))}
-        </ScrollView>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Settings</Text>
-        <View style={styles.settingsContainer}>
-          <SettingsItem label="Personal Information" />
-          <SettingsItem label="Notifications" />
-          <SettingsItem label="Privacy" />
-          <SettingsItem label="Help & Support" />
-        </View>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
-        <View style={styles.settingsContainer}>
-          <TouchableOpacity
-            style={[styles.settingsItem, { borderBottomWidth: 0 }]}
-            onPress={() => {
-              signOut();
-              router.push('/(auth)/signin');
-            }}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Achievements</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.achievementsContainer}
           >
-            <Text style={[styles.settingsLabel, { color: '#ff4444' }]}>
-              Sign Out
-            </Text>
-            <ChevronRight color="#ff4444" size={20} />
-          </TouchableOpacity>
+            {achievements && achievements.length > 0 ? (
+              achievements.map((achievement) => (
+                <AchievementCard
+                  key={achievement.id}
+                  icon={<Award color="#5ee6b8" size={24} />}
+                  title={achievement.title}
+                  description={achievement.description}
+                />
+              ))
+            ) : (
+              <View style={styles.achievementCard}>
+                <View style={styles.achievementIcon}>
+                  <Award color="#5ee6b8" size={24} />
+                </View>
+                <Text style={styles.achievementTitle}>No Achievements</Text>
+                <Text style={styles.achievementDescription}>
+                  Complete activities to earn achievements
+                </Text>
+              </View>
+            )}
+          </ScrollView>
         </View>
-      </View>
-    </ScrollView>
-  </SafeAreaView>
-);
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Settings</Text>
+          <View style={styles.settingsContainer}>
+            <SettingsItem label="Personal Information" />
+            <SettingsItem label="Notifications" />
+            <SettingsItem label="Privacy" />
+            <SettingsItem label="Help & Support" />
+          </View>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          <View style={styles.settingsContainer}>
+            <TouchableOpacity
+              style={[styles.settingsItem, { borderBottomWidth: 0 }]}
+              onPress={() => {
+                signOut();
+                router.push('/(auth)/signin');
+              }}
+            >
+              <Text style={[styles.settingsLabel, { color: '#ff4444' }]}>
+                Sign Out
+              </Text>
+              <ChevronRight color="#ff4444" size={20} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 interface AchievementCardProps {
@@ -198,6 +237,9 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
   },
+  bioContainer: {
+    marginBottom: 24,
+  },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -236,7 +278,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     fontSize: 16,
     color: '#a0a0a0',
-    marginBottom: 24,
+    marginBottom: 2,
   },
   statsRow: {
     flexDirection: 'row',
