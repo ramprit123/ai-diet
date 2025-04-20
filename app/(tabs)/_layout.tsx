@@ -1,6 +1,12 @@
 import { Tabs } from 'expo-router';
-import { StyleSheet, View, Text } from 'react-native';
-import { Chrome as Home, ChefHat, Camera, ChartBar as BarChart2, User } from 'lucide-react-native';
+import {
+  ChartBar as BarChart2,
+  Camera,
+  ChefHat,
+  Chrome as Home,
+  User,
+} from 'lucide-react-native';
+import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
