@@ -3,6 +3,7 @@ import { MealPlan } from '@/components/MealPlan';
 import { NutritionProgress } from '@/components/NutritionProgress';
 import { RecipeRecommendations } from '@/components/RecipeRecommendations';
 import { ToolCards } from '@/components/ToolCards';
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 
 export default function HomeScreen() {
