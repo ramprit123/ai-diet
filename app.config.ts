@@ -2,7 +2,7 @@ import { ExpoConfig, ConfigContext } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'AI Diet',
+  name: 'AI Nutrition Diet',
   slug: 'ai-diet',
   scheme: 'ai-diet',
   version: '1.0.0',
@@ -12,33 +12,31 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   splash: {
     image: './assets/images/icon.png',
     resizeMode: 'contain',
-    backgroundColor: '#121212'
+    backgroundColor: '#121212',
   },
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.aidiet.app'
+    bundleIdentifier: 'com.aidiet.app',
   },
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/images/icon.png',
-      backgroundColor: '#121212'
+      backgroundColor: '#121212',
     },
-    package: 'com.aidiet.app'
+    package: 'com.aidiet.app',
   },
   web: {
-    favicon: './assets/images/favicon.png'
+    favicon: './assets/images/favicon.png',
   },
-  plugins: [
-    'expo-router'
-  ],
+  plugins: ['expo-router'],
   extra: {
     router: {
-      origin: false
+      origin: false,
     },
     eas: {
-      projectId: 'your-project-id'
-    }
+      projectId: 'your-project-id',
+    },
   },
-  owner: 'your-expo-username'
+  owner: 'your-expo-username',
 });

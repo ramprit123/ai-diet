@@ -1,3 +1,5 @@
+import { useAuth } from '@/lib/auth-context';
+import { useRouter } from 'expo-router';
 import {
   Award,
   Bell,
@@ -16,6 +18,8 @@ import {
 } from 'react-native';
 
 export default function ProfileScreen() {
+  const router = useRouter();
+  const { signOut } = useAuth();
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -93,6 +97,23 @@ export default function ProfileScreen() {
             <SettingsItem label="Notifications" />
             <SettingsItem label="Privacy" />
             <SettingsItem label="Help & Support" />
+          </View>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          <View style={styles.settingsContainer}>
+            <TouchableOpacity
+              style={[styles.settingsItem, { borderBottomWidth: 0 }]}
+              onPress={() => {
+                signOut();
+                router.push('/(auth)/signin');
+              }}
+            >
+              <Text style={[styles.settingsLabel, { color: '#ff4444' }]}>
+                Sign Out
+              </Text>
+              <ChevronRight color="#ff4444" size={20} />
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

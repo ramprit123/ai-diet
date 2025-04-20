@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
 import { AuthWrapper } from '@/components/AuthWrapper';
-import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import {
-  useFonts,
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
+  useFonts,
 } from '@expo-google-fonts/inter';
-import { SplashScreen } from 'expo-router';
+import { SplashScreen, Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,12 +34,40 @@ export default function RootLayout() {
 
   return (
     <AuthWrapper>
-      <StatusBar style="light" />
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
+        <StatusBar style="inverted" backgroundColor="transparent" translucent />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: 'slide_from_right',
+            animationDuration: 200,
+            presentation: 'card',
+            animationTypeForReplace: 'push',
+          }}
+        >
+          <Stack.Screen
+            name="index"
+            options={{
+              headerShown: false,
+              animation: 'fade',
+            }}
+          />
+          <Stack.Screen
+            name="(auth)"
+            options={{
+              headerShown: false,
+              animation: 'fade_from_bottom',
+            }}
+          />
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+              animation: 'slide_from_bottom',
+            }}
+          />
+        </Stack>
+      </SafeAreaView>
     </AuthWrapper>
   );
 }

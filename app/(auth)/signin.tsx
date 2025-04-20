@@ -5,11 +5,14 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { ArrowRight, Apple, Eye } from 'lucide-react-native';
 import { useState } from 'react';
-import { useAuth } from '../../lib/auth-context';
+import { useAuth } from '@/lib/auth-context';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -56,101 +59,112 @@ export default function SignIn() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.iconContainer}>
-          <ArrowRight color="#5ee6b8" size={24} />
-        </View>
-        <Text style={styles.title}>Welcome back</Text>
-        <Text style={styles.subtitle}>Sign in to continue</Text>
-      </View>
-
-      <View style={styles.socialButtons}>
-        <TouchableOpacity
-          style={styles.socialButton}
-          onPress={handleGoogleSignIn}
-        >
-          <View style={styles.googleIcon}>
-            <Text style={styles.googleText}>G</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <ArrowRight color="#5ee6b8" size={24} />
           </View>
-          <Text style={styles.socialButtonText}>Continue with Google</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.socialButton}
-          onPress={handleAppleSignIn}
-        >
-          <Apple color="#fff" size={20} />
-          <Text style={styles.socialButtonText}>Continue with Apple</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.divider}>
-        <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>or</Text>
-        <View style={styles.dividerLine} />
-      </View>
-
-      <View style={styles.form}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Email address"
-            placeholderTextColor="#6e7781"
-            style={styles.input}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
+          <Text style={styles.title}>Welcome back</Text>
+          <Text style={styles.subtitle}>Sign in to continue</Text>
         </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Password"
-            placeholderTextColor="#6e7781"
-            style={styles.input}
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-          />
+        <View style={styles.socialButtons}>
           <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}
+            style={styles.socialButton}
+            onPress={handleGoogleSignIn}
           >
-            <Eye color="#6e7781" size={20} />
+            <View style={styles.googleIcon}>
+              <Text style={styles.googleText}>G</Text>
+            </View>
+            <Text style={styles.socialButtonText}>Continue with Google</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.socialButton}
+            onPress={handleAppleSignIn}
+          >
+            <Apple color="#fff" size={20} />
+            <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={[styles.signInButton, loading && styles.disabledButton]}
-          onPress={handleSignIn}
-          disabled={loading}
-        >
-          <Text style={styles.signInButtonText}>
-            {loading ? 'Signing in...' : 'Sign In'}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>or</Text>
+          <View style={styles.dividerLine} />
+        </View>
 
-        <Link href="/(auth)/forgot-password" asChild>
-          <TouchableOpacity>
-            <Text style={styles.link}>Forgot Password?</Text>
+        <View style={styles.form}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Email address"
+              placeholderTextColor="#6e7781"
+              style={styles.input}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor="#6e7781"
+              style={styles.input}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Eye color="#6e7781" size={20} />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.signInButton, loading && styles.disabledButton]}
+            onPress={handleSignIn}
+            disabled={loading}
+          >
+            <Text style={styles.signInButtonText}>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </Text>
           </TouchableOpacity>
-        </Link>
 
-        <View style={styles.signup}>
-          <Text style={styles.signupText}>Don't have an account? </Text>
-          <Link href="/(auth)/signup" asChild>
+          <Link href="/(auth)/forgot-password" asChild>
             <TouchableOpacity>
-              <Text style={styles.link}>Sign Up</Text>
+              <Text style={styles.link}>Forgot Password?</Text>
             </TouchableOpacity>
           </Link>
+
+          <View style={styles.signup}>
+            <Text style={styles.signupText}>Don't have an account? </Text>
+            <Link href="/(auth)/signup" asChild>
+              <TouchableOpacity>
+                <Text style={styles.link}>Sign Up</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: '#121212',
