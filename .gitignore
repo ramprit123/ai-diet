@@ -1,6 +1,11 @@
 # dependencies
 node_modules/
 .env
+supabase/
+supabase/.env
+# supabase
+supabase/.env
+supabase/.env.local
 # expo
 .expo/
 dist/
