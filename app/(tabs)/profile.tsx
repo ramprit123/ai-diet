@@ -1,12 +1,7 @@
 import { useAuth } from '@/lib/auth-context';
+import { useProfileStore } from '@/lib/stores/profile-store';
 import { useRouter } from 'expo-router';
-import {
-  Award,
-  Bell,
-  Calendar,
-  ChevronRight,
-  Settings,
-} from 'lucide-react-native';
+import { Award, ChevronRight, Settings } from 'lucide-react-native';
 import {
   Image,
   SafeAreaView,
@@ -15,11 +10,29 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
+import { useEffect } from 'react';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { signOut } = useAuth();
+  const {
+    profile,
+    stats,
+    achievements,
+    isLoading,
+    error,
+    fetchProfile,
+    fetchStats,
+    fetchAchievements,
+  } = useProfileStore();
+
+  useEffect(() => {
+    fetchProfile();
+    fetchStats();
+    fetchAchievements();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -35,30 +48,46 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.profileInfo}>
-            <Image
-              source={{
-                uri: 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg',
-              }}
-              style={styles.profileImage}
-            />
-            <Text style={styles.name}>Sarah Wilson</Text>
-            <Text style={styles.bio}>
-              Fitness enthusiast & healthy food lover 🥗
-            </Text>
+            {isLoading ? (
+              <ActivityIndicator size="large" color="#5ee6b8" />
+            ) : error ? (
+              <Text style={[styles.bio, { color: '#ff4444' }]}>{error}</Text>
+            ) : (
+              <>
+                <Image
+                  source={{
+                    uri:
+                      profile?.avatar_url ||
+                      'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg',
+                  }}
+                  style={styles.profileImage}
+                />
+                <Text style={styles.name}>{profile?.full_name || 'User'}</Text>
+                <Text style={styles.bio}>
+                  {profile?.bio || 'No bio available'}
+                </Text>
+              </>
+            )}
 
             <View style={styles.statsRow}>
               <View style={styles.stat}>
-                <Text style={styles.statValue}>156</Text>
+                <Text style={styles.statValue}>
+                  {stats?.workouts_count || 0}
+                </Text>
                 <Text style={styles.statLabel}>Workouts</Text>
               </View>
               <View style={styles.statDivider} />
               <View style={styles.stat}>
-                <Text style={styles.statValue}>32</Text>
+                <Text style={styles.statValue}>
+                  {stats?.recipes_count || 0}
+                </Text>
                 <Text style={styles.statLabel}>Recipes</Text>
               </View>
               <View style={styles.statDivider} />
               <View style={styles.stat}>
-                <Text style={styles.statValue}>8.5k</Text>
+                <Text style={styles.statValue}>
+                  {(stats?.calories_burned || 0).toLocaleString()}
+                </Text>
                 <Text style={styles.statLabel}>Calories</Text>
               </View>
             </View>
@@ -72,21 +101,14 @@ export default function ProfileScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.achievementsContainer}
           >
-            <AchievementCard
-              icon={<Award color="#5ee6b8" size={24} />}
-              title="30 Day Streak"
-              description="Logged meals for 30 days"
-            />
-            <AchievementCard
-              icon={<Calendar color="#5ee6b8" size={24} />}
-              title="Goal Crusher"
-              description="Hit all weekly targets"
-            />
-            <AchievementCard
-              icon={<Bell color="#5ee6b8" size={24} />}
-              title="Early Bird"
-              description="7AM workout complete"
-            />
+            {achievements.map((achievement) => (
+              <AchievementCard
+                key={achievement.id}
+                icon={<Award color="#5ee6b8" size={24} />}
+                title={achievement.title}
+                description={achievement.description}
+              />
+            ))}
           </ScrollView>
         </View>
 
