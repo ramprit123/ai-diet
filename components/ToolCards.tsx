@@ -1,16 +1,19 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Sparkles, Camera } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 export function ToolCards() {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <View style={styles.cardsRow}>
-        <ToolCard 
+        <ToolCard
+          onPress={() => router.push('/generate-ai-recipe')}
           title="Smart Recipe Generator"
           description="Generate personalized recipes"
           icon={<Sparkles color="#5ee6b8" size={24} />}
         />
-        <ToolCard 
+        <ToolCard
           title="Meal Analysis"
           description="Scan food for instant nutrition info"
           icon={<Camera color="#5ee6b8" size={24} />}
@@ -24,14 +27,13 @@ interface ToolCardProps {
   title: string;
   description: string;
   icon: React.ReactNode;
+  onPress?: () => void;
 }
 
-function ToolCard({ title, description, icon }: ToolCardProps) {
+function ToolCard({ title, description, icon, onPress }: ToolCardProps) {
   return (
-    <TouchableOpacity style={styles.card}>
-      <View style={styles.iconContainer}>
-        {icon}
-      </View>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
+      <View style={styles.iconContainer}>{icon}</View>
       <Text style={styles.cardTitle}>{title}</Text>
       <Text style={styles.cardDescription}>{description}</Text>
     </TouchableOpacity>

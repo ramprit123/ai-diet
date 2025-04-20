@@ -1,19 +1,24 @@
 import { AuthWrapper } from '@/components/AuthWrapper';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 import {
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
   useFonts,
 } from '@expo-google-fonts/inter';
-import { SplashScreen, Stack } from 'expo-router';
+import { SplashScreen, Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CrossIcon, EyeClosed, X } from 'lucide-react-native';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const router = useRouter();
   useFrameworkReady();
 
   const [fontsLoaded, fontError] = useFonts({
@@ -59,6 +64,21 @@ export default function RootLayout() {
             options={{
               headerShown: false,
               animation: 'fade_from_bottom',
+            }}
+          />
+          <Stack.Screen
+            name="generate-ai-recipe/index"
+            options={{
+              headerShown: true,
+              title: 'Generate AI Recipe',
+              animation: 'fade_from_bottom',
+              presentation: 'modal',
+              animationTypeForReplace: 'push',
+              headerLeft: () => (
+                <TouchableOpacity onPress={() => router.dismiss()}>
+                  <X size={24} color={'#5ee6b8'} />
+                </TouchableOpacity>
+              ),
             }}
           />
           <Stack.Screen
