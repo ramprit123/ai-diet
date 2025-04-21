@@ -71,12 +71,30 @@ export default function RootLayout() {
             options={{
               headerShown: true,
               title: 'Generate AI Recipe',
-              animation: 'fade_from_bottom',
+              animation: 'slide_from_bottom',
               presentation: 'modal',
+              headerStyle: {
+                backgroundColor: 'transparent',
+              },
+              headerTitleStyle: {
+                color: '#000', // Will adapt to theme
+                fontFamily: 'Inter-SemiBold',
+                fontSize: 18,
+              },
+              headerShadowVisible: false,
+              headerTransparent: true,
+              headerBlurEffect: 'light',
               animationTypeForReplace: 'push',
               headerLeft: () => (
-                <TouchableOpacity onPress={() => router.dismiss()}>
-                  <X size={24} color={'#5ee6b8'} />
+                <TouchableOpacity
+                  onPress={() => router.dismiss()}
+                  style={{
+                    padding: 8,
+                    borderRadius: 20,
+                    backgroundColor: 'rgba(0,0,0,0.05)',
+                  }}
+                >
+                  <X size={20} color={'#ffff'} style={{ opacity: 0.6 }} />
                 </TouchableOpacity>
               ),
             }}

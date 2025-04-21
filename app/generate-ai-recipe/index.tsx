@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import { ChefHat } from 'lucide-react-native';
 
 const GenerateAIRecipe = () => {
@@ -10,13 +19,41 @@ const GenerateAIRecipe = () => {
     cuisineType: '',
   });
   const [loading, setLoading] = useState(false);
+  const [recipe, setRecipe] = useState(null);
 
   const handleGenerate = async () => {
-    setLoading(true);
-    // TODO: Implement AI recipe generation logic
-    setTimeout(() => setLoading(false), 2000);
-  };
+    try {
+      setLoading(true);
+      const response = await fetch('/api/recipe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ingredients: formData.ingredients,
+          cuisine: formData.cuisineType,
+          dietaryPreferences: formData.dietaryPreferences,
+        }),
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to generate recipe');
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Recipe generation failed');
+      }
+
+      setRecipe(data.data);
+    } catch (error) {
+      console.error('Error generating recipe:', error);
+      Alert.alert('Error', 'Failed to generate recipe. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  console.log('recipe', JSON.stringify(recipe));
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -35,7 +72,9 @@ const GenerateAIRecipe = () => {
             placeholder="e.g., vegetarian, gluten-free"
             placeholderTextColor="#6e7781"
             value={formData.dietaryPreferences}
-            onChangeText={(text) => setFormData({ ...formData, dietaryPreferences: text })}
+            onChangeText={(text) =>
+              setFormData({ ...formData, dietaryPreferences: text })
+            }
           />
         </View>
 
@@ -46,7 +85,9 @@ const GenerateAIRecipe = () => {
             placeholder="e.g., chicken, rice, vegetables"
             placeholderTextColor="#6e7781"
             value={formData.ingredients}
-            onChangeText={(text) => setFormData({ ...formData, ingredients: text })}
+            onChangeText={(text) =>
+              setFormData({ ...formData, ingredients: text })
+            }
           />
         </View>
 
@@ -58,7 +99,9 @@ const GenerateAIRecipe = () => {
             placeholderTextColor="#6e7781"
             keyboardType="numeric"
             value={formData.cookingTime}
-            onChangeText={(text) => setFormData({ ...formData, cookingTime: text })}
+            onChangeText={(text) =>
+              setFormData({ ...formData, cookingTime: text })
+            }
           />
         </View>
 
@@ -69,7 +112,9 @@ const GenerateAIRecipe = () => {
             placeholder="e.g., Italian, Asian, Mexican"
             placeholderTextColor="#6e7781"
             value={formData.cuisineType}
-            onChangeText={(text) => setFormData({ ...formData, cuisineType: text })}
+            onChangeText={(text) =>
+              setFormData({ ...formData, cuisineType: text })
+            }
           />
         </View>
 
@@ -93,6 +138,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#121212',
+    marginTop: 30,
   },
   header: {
     alignItems: 'center',
