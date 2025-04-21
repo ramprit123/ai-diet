@@ -7,10 +7,109 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 export default function ScanScreen() {
   const [showResults, setShowResults] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+  const handleImageCapture = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission needed',
+          'Please grant camera permissions to use this feature.'
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        await processImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to capture image');
+      console.error(error);
+    }
+  };
+
+  const handleImageUpload = async () => {
+    try {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission needed',
+          'Please grant media library permissions to use this feature.'
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        await processImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to upload image');
+      console.error(error);
+    }
+  };
+
+  const processImage = async (uri: string) => {
+    try {
+      setLoading(true);
+
+      // Resize and compress the image
+      const manipResult = await manipulateAsync(
+        uri,
+        [{ resize: { width: 800 } }],
+        { compress: 0.8, format: SaveFormat.JPEG, base64: true }
+      );
+
+      if (!manipResult.base64) {
+        throw new Error('Failed to process image');
+      }
+
+      // Send to API for analysis
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: manipResult.base64 }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze image');
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Analysis failed');
+      }
+
+      setImageUri(uri);
+      setAnalysisResult(data.data);
+      setShowResults(true);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to analyze image');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,14 +132,23 @@ export default function ScanScreen() {
 
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                style={styles.button}
-                onPress={() => setShowResults(true)}
+                style={[styles.button, loading && styles.disabledButton]}
+                onPress={handleImageCapture}
+                disabled={loading}
               >
                 <Camera color="white" size={24} />
                 <Text style={styles.buttonText}>Take Photo</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={[styles.button, styles.secondaryButton]}>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  styles.secondaryButton,
+                  loading && styles.disabledButton,
+                ]}
+                onPress={handleImageUpload}
+                disabled={loading}
+              >
                 <ImageIcon color="#5ee6b8" size={24} />
                 <Text style={[styles.buttonText, styles.secondaryButtonText]}>
                   Upload Photo
@@ -75,19 +183,52 @@ export default function ScanScreen() {
 
             <Image
               source={{
-                uri: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+                uri:
+                  imageUri ||
+                  'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
               }}
               style={styles.resultImage}
             />
 
             <View style={styles.nutritionCard}>
-              <Text style={styles.foodName}>Mediterranean Bowl</Text>
+              <Text style={styles.foodName}>
+                {analysisResult?.analysis?.foodIdentification?.name ||
+                  'Food Analysis'}
+              </Text>
 
               <View style={styles.nutritionGrid}>
-                <NutritionItem label="Calories" value="420" unit="kcal" />
-                <NutritionItem label="Protein" value="22" unit="g" />
-                <NutritionItem label="Carbs" value="48" unit="g" />
-                <NutritionItem label="Fat" value="18" unit="g" />
+                <NutritionItem
+                  label="Calories"
+                  value={String(
+                    analysisResult?.analysis?.nutritionalData?.perPortion
+                      ?.calories?.value || '0'
+                  )}
+                  unit="kcal"
+                />
+                <NutritionItem
+                  label="Protein"
+                  value={String(
+                    analysisResult?.analysis?.nutritionalData?.perPortion
+                      ?.macros?.protein?.value || '0'
+                  )}
+                  unit="g"
+                />
+                <NutritionItem
+                  label="Carbs"
+                  value={String(
+                    analysisResult?.analysis?.nutritionalData?.perPortion
+                      ?.macros?.carbs?.value || '0'
+                  )}
+                  unit="g"
+                />
+                <NutritionItem
+                  label="Fat"
+                  value={String(
+                    analysisResult?.analysis?.nutritionalData?.perPortion
+                      ?.macros?.fat?.value || '0'
+                  )}
+                  unit="g"
+                />
               </View>
 
               <TouchableOpacity style={styles.logButton}>
@@ -136,6 +277,9 @@ function NutritionItem({ label, value, unit }: NutritionItemProps) {
 }
 
 const styles = StyleSheet.create({
+  disabledButton: {
+    opacity: 0.5,
+  },
   container: {
     flex: 1,
     backgroundColor: '#121212',
